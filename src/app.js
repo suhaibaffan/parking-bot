@@ -5,6 +5,7 @@ import logger from 'koa-logger';
 import chalk from 'chalk';
 import { promisify } from 'util';
 import { PORT } from './env';
+import './db/init';
 
 main();
 
