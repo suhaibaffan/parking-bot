@@ -1,5 +1,5 @@
 # Automate Parking
-Reserve a parking place and maintain in and out for a parking place, which can also hit using RFTag reader.
+Reserve a parking spot and maintain in and out for a parking place, which can also hit using RFTag reader.
 
 ## Table of Contents
 
