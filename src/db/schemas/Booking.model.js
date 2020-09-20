@@ -6,7 +6,7 @@ const BookingSchema = new mongoose.Schema({
     booking_at: { type: Date, default: Date.now },
     rfid: { type: String, minlength: 5, maxlength: 10 },
     booking: { type: String, default: rndm( 16 ) },
-    parking_slot: Number,
+    parking_slot: { type: mongoose.Schema.Types.ObjectId, ref: 'slot' },
     parked_at: Date,
     left_at: Date,
     parking: { type: Boolean, default: false },

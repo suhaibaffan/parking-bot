@@ -1,4 +1,5 @@
 import { Booking } from '../../db/schemas/Booking.model';
+import { Parking } from '../../db/schemas/Parking.model';
 import { RESERVED_SLOTS, TOTAL_SLOTS } from '../../env';
 
 
@@ -7,56 +8,60 @@ export async function findByRfTag ( ctx ) {
 }
 
 export async function checkForReservedParkings ( ctx, next ) {
-    const count = await Booking.count({ type: 'reserved', parking: true });
-    if ( count > RESERVED_SLOTS - 1 ) {
-        ctx.status = 400;
-        ctx.message = 'Reserve parking full.'
-        return ctx;
-    }
-    ctx.state.count = count;
+    // const count = await Parking.count({ type: 'reserved', vacant: true });
+    // Can also add white list of reserved rftags.
+        // allow normal bookings.
     return next();
 }
 
 export async function checkForNormalParkings ( ctx, next ) {
-    const count = await Booking.count({ type: 'normal', parking: true });
-    if ( count > ( TOTAL_SLOTS - RESERVED_SLOTS - 1 ) ) {
+    const count = await Parking.count({ type: 'normal', vacant: true });
+    if ( count === 0 ) {
         ctx.status = 400;
-        ctx.message = 'Normal parking full.'
+        ctx.message = 'Parking full.'
         return ctx;
     }
-
-    ctx.state.count = count;
     return next();
 }
 
 export async function saveBooking ( ctx, next ) {
     const { type, rfid } = ctx.request?.body;
-    let { count } = ctx?.state;
+    let vacantParking = await Parking.findOne({ type , vacant: true }).lean();
 
-    const parkingSlot = type === 'reserved' ? count + 1 : RESERVED_SLOTS + 1;
+    if ( !vacantParking ) {
+        vacantParking = await Parking.findOne({ type: 'normal' , vacant: true }).lean();
+    }
 
     const booking = new Booking({
-        rfid, type, parking_slot: parkingSlot
+        rfid, type, parking_slot: vacantParking._id
     });
 
-    const response = await booking.save();
+    const createdBooking = await booking.save();
+    await Parking.findByIdAndUpdate( vacantParking._id, { vacant: false });
+
+    const bookingWithRef = await createdBooking.populate( 'parking_slot' ).execPopulate();
     ctx.status = 200;
     ctx.body = {
         status: 'Booking confirmed',
-        parking_slot: response.parking_slot,
-        booking_id: response.booking
+        parking_slot: bookingWithRef.parking_slot.slot,
+        type,
+        booking_id: bookingWithRef.booking
     }
     return next();
 }
 
 export async function checkForExistingBooking ( ctx, next ) {
     const { rfid } = ctx.request.body;
-    const booking = await Booking.findOne({ rfid, booking_at: { $gte: new Date().getTime() - ( 15 * 60 * 1000 ) } }).lean();
+    const booking = await Booking.findOne({
+            rfid,
+            booking_at: { $gte: new Date().getTime() - ( 15 * 60 * 1000 ) }
+        }).populate( 'parking_slot' ).lean();
+
     if ( booking ) {
         ctx.status = 200;
         ctx.body = {
             status: 'Booking already exists',
-            parking_slot: booking.parking_slot,
+            parking_slot: booking.parking_slot.slot,
             booking_id: booking.booking
         };
         return ctx;

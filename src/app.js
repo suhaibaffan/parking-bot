@@ -3,9 +3,9 @@ import parser from 'koa-bodyparser';
 import KoaRouter from 'koa-router';
 import logger from 'koa-logger';
 import chalk from 'chalk';
-import { promisify } from 'util';
-import { PORT } from './env';
+import { PORT, RESET } from './env';
 import './db/init';
+import setUpParkingArena from './config/parking';
 import { checkForExistingBooking, checkForReservedParkings, checkForNormalParkings, saveBooking } from './routes/api/booking';
 import { validateInputs } from './utils/validator';
 
@@ -22,6 +22,10 @@ async function startServer () {
     app.use( logger() )
     app.use( parser() )
 
+    console.log( chalk.yellow( 'Configuring parking slots...' ) );
+    await setUpParkingArena();
+    console.log( chalk.green( RESET ? 'Parking slots are reset and ready for booking.' : 'Parking slots unchanged' ) );
+
     const router = new KoaRouter();
 
     router.get( '/test', ( ctx, next ) => {
@@ -30,7 +34,7 @@ async function startServer () {
     router.post( '/scan/rfTag', ( ctx, next ) => {
     });
 
-    router.post( '/book/reserve',  validateInputs, checkForReservedParkings, checkForExistingBooking, saveBooking );
+    router.post( '/book/reserve',  validateInputs, checkForReservedParkings, checkForNormalParkings, checkForExistingBooking, saveBooking );
     router.post( '/book/normal', validateInputs, checkForNormalParkings, checkForExistingBooking, saveBooking );
 
     app.use( router.routes() );
