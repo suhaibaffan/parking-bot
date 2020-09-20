@@ -12,7 +12,7 @@ Reserve a parking spot and maintain in and out for a parking place, which can al
 <!-- tocstop -->
 
 ## Overview
-Reserve a parking spot and maintain in and out for a parking place, which can also hit using RFTag reader.
+Reserve a parking spot and maintain in and out for a parking place, which can also be hit using RFTag reader.
 
 ## How to build
 Clone the repo and run `yarn` and `yarn build`
