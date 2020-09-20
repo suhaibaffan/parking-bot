@@ -2269,6 +2269,14 @@ negotiator@0.6.2:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
   integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
 
+node-cron@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/node-cron/-/node-cron-2.0.3.tgz#b9649784d0d6c00758410eef22fa54a10e3f602d"
+  integrity sha512-eJI+QitXlwcgiZwNNSRbqsjeZMp5shyajMR81RZCqeW0ZDEj4zU9tpd4nTh/1JsBiKbF8d08FCewiipDmVIYjg==
+  dependencies:
+    opencollective-postinstall "^2.0.0"
+    tz-offset "0.0.1"
+
 node-environment-flags@^1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/node-environment-flags/-/node-environment-flags-1.0.6.tgz#a30ac13621f6f7d674260a54dede048c3982c088"
@@ -2368,6 +2376,11 @@ only@~0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/only/-/only-0.0.2.tgz#2afde84d03e50b9a8edc444e30610a70295edfb4"
   integrity sha1-Kv3oTQPlC5qO3EROMGEKcCle37Q=
+
+opencollective-postinstall@^2.0.0:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz#7a0fff978f6dbfa4d006238fbac98ed4198c3259"
+  integrity sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==
 
 p-limit@^2.0.0:
   version "2.3.0"
@@ -2876,6 +2889,11 @@ type-is@^1.6.16:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
+
+tz-offset@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/tz-offset/-/tz-offset-0.0.1.tgz#fef920257024d3583ed9072a767721a18bdb8a76"
+  integrity sha512-kMBmblijHJXyOpKzgDhKx9INYU4u4E1RPMB0HqmKSgWG8vEcf3exEfLh4FFfzd3xdQOw9EuIy/cP0akY6rHopQ==
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"

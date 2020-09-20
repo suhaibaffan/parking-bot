@@ -1,7 +1,6 @@
+import chalk from 'chalk';
 import { Booking } from '../../db/schemas/Booking.model';
 import { Parking } from '../../db/schemas/Parking.model';
-import { RESERVED_SLOTS, TOTAL_SLOTS } from '../../env';
-
 
 export async function findByRfTag ( ctx ) {
     const { rfTag } = ctx.request.body || ctx.request.query;
@@ -11,16 +10,6 @@ export async function checkForReservedParkings ( ctx, next ) {
     // const count = await Parking.count({ type: 'reserved', vacant: true });
     // Can also add white list of reserved rftags.
         // allow normal bookings.
-    return next();
-}
-
-export async function checkForNormalParkings ( ctx, next ) {
-    const count = await Parking.count({ type: 'normal', vacant: true });
-    if ( count === 0 ) {
-        ctx.status = 400;
-        ctx.message = 'Parking full.'
-        return ctx;
-    }
     return next();
 }
 
@@ -54,7 +43,7 @@ export async function checkForExistingBooking ( ctx, next ) {
     const { rfid } = ctx.request.body;
     const booking = await Booking.findOne({
             rfid,
-            booking_at: { $gte: new Date().getTime() - ( 15 * 60 * 1000 ) }
+            booking_at: { $gte: new Date().getTime() - ( 30 * 60 * 1000 ) }
         }).populate( 'parking_slot' ).lean();
 
     if ( booking ) {
@@ -67,4 +56,18 @@ export async function checkForExistingBooking ( ctx, next ) {
         return ctx;
     }
     return next();
+}
+
+export async function cancelExpiredBookings () {
+    const bookings = await Booking.find({
+        expired: false,
+        booking_at: { $gte: new Date().getTime() - ( 15 * 60 * 1000 ) }
+    }).populate( 'parking_slot' );
+    
+    for ( const booking of bookings ) {
+        booking.expired = true;
+        Parking.findByIdAndUpdate( booking.parking_slot._id, { vacant: true });
+        await booking.save();
+    }
+    console.log( chalk.blueBright( `${bookings.length} Expired bookings updated` ) );
 }

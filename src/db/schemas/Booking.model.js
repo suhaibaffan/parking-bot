@@ -10,7 +10,8 @@ const BookingSchema = new mongoose.Schema({
     parked_at: Date,
     left_at: Date,
     parking: { type: Boolean, default: false },
-    type: { type: String, enum: [ 'reserved', 'normal' ]}
+    type: { type: String, enum: [ 'reserved', 'normal' ]},
+    expired: { type: Boolean, default: false }
 });
 
 export const Booking = db.model( 'booking', BookingSchema );

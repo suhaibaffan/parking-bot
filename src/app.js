@@ -3,10 +3,12 @@ import parser from 'koa-bodyparser';
 import KoaRouter from 'koa-router';
 import logger from 'koa-logger';
 import chalk from 'chalk';
+import cron from 'node-cron';
 import { PORT, RESET } from './env';
 import './db/init';
 import setUpParkingArena from './config/parking';
-import { checkForExistingBooking, checkForReservedParkings, checkForNormalParkings, saveBooking } from './routes/api/booking';
+import { checkForExistingBooking, checkForReservedParkings, saveBooking, cancelExpiredBookings } from './routes/api/booking';
+import { checkForNormalParkings } from './routes/api/parking';
 import { validateInputs } from './utils/validator';
 
 main();
@@ -46,6 +48,10 @@ async function startServer () {
     app.listen( PORT );
 
     console.log( `HTTP server listening on port ${chalk.bold( PORT )}` );
+    cron.schedule( '* * * * *', () => {
+        console.log( chalk.redBright( 'Checking for expired bookings...' ) );
+        cancelExpiredBookings();
+    });
 }
 
 function errorHandlerMiddleware () {
