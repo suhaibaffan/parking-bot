@@ -8,7 +8,14 @@ Reserve a parking spot and maintain in and out for a parking place, which can al
 - [Overview](#overview)
 - [How to Build](#how-to-build)
 - [How to Run](#how-to-run)
-- [How to Test](#how-to-test)
-- [How to Deploy](#how-to-deploy)
 
 <!-- tocstop -->
+
+## Overview
+Reserve a parking spot and maintain in and out for a parking place, which can also hit using RFTag reader.
+
+## How to build
+Clone the repo and run `yarn` and `yarn build`
+
+## Hot to run
+Run command `yarn start`.

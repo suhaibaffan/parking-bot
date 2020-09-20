@@ -23,7 +23,7 @@ export async function saveBooking ( ctx, next ) {
         vacantParking = await Parking.findOne({ type: 'normal' , vacant: true }).lean();
     }
 
-    const userType = await User.findOne({ rfid }, type ).lean();
+    const { type: userType} = await User.findOne({ rfid }, 'type' ).lean();
 
     if ( userType !== 'reserved' && type === 'reserved' ) {
         // throw error if normal user tries to book reserved slots.
@@ -36,7 +36,7 @@ export async function saveBooking ( ctx, next ) {
 
     const availableParkings = await Parking.find({ vacant: false }, 'slot type' );
 
-    const parkingsMoreThanHalfTheSpace = availableParkings.length - ( TOTAL_SLOTS / 2 ) > 0;
+    const parkingsMoreThanHalfTheSpace = availableParkings.length - Math.round( ( TOTAL_SLOTS / 2 ) ) > 0;
     const booking = new Booking({
         rfid,
         type,
