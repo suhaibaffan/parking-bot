@@ -34,8 +34,11 @@ async function startServer () {
     router.get( '/test', ( ctx, next ) => {
         ctx.body = 'Server is up.'
     });
-    router.post( '/scan/rfTag', ( ctx, next ) => {
-    });
+
+    // this can be used when user enters parking space and rftag reader can send data
+    // to allow entry
+    // router.post( '/scan/rfTag', ( ctx, next ) => {
+    // });
 
     // parking apis
     router.get( '/parking/available', getAvailableParking );

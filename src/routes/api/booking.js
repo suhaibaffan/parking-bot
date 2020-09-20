@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { Booking } from '../../db/schemas/Booking.model';
 import { Parking } from '../../db/schemas/Parking.model';
 import { User } from '../../db/schemas/User.model';
+import { TOTAL_SLOTS } from '../../env';
 
 export async function findByRfTag ( ctx ) {
     const { rfTag } = ctx.request.body || ctx.request.query;
@@ -33,8 +34,14 @@ export async function saveBooking ( ctx, next ) {
         return ctx;
     }
 
+    const availableParkings = await Parking.find({ vacant: false }, 'slot type' );
+
+    const parkingsMoreThanHalfTheSpace = availableParkings.length - ( TOTAL_SLOTS / 2 ) > 0;
     const booking = new Booking({
-        rfid, type, parking_slot: vacantParking._id
+        rfid,
+        type,
+        parking_slot: vacantParking._id,
+        ...parkingsMoreThanHalfTheSpace ? { parking_available: Date.now() } : null
     });
 
     const createdBooking = await booking.save();
@@ -46,7 +53,8 @@ export async function saveBooking ( ctx, next ) {
         status: 'Booking confirmed',
         parking_slot: bookingWithRef.parking_slot.slot,
         type,
-        booking_id: bookingWithRef.booking
+        booking_id: bookingWithRef.booking,
+        parking_available_at: createdBooking.parking_available
     }
     return next();
 }
@@ -80,7 +88,8 @@ export async function checkForExistingBooking ( ctx, next ) {
         ctx.body = {
             status: 'Booking already exists',
             parking_slot: booking.parking_slot.slot,
-            booking_id: booking.booking
+            booking_id: booking.booking,
+            parking_available_at: booking.parking_available
         };
         return ctx;
     }
