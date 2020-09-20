@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import { createServer } from 'http';
+import parser from 'koa-bodyparser';
 import KoaRouter from 'koa-router';
 import logger from 'koa-logger';
 import chalk from 'chalk';
@@ -18,17 +18,23 @@ async function startServer () {
     const app = new Koa();
     app.use( errorHandlerMiddleware() );
     app.use( logger() )
+    app.use( parser() )
 
     const router = new KoaRouter();
+
+    router.get( '/test', ( ctx, next ) => {
+        ctx.body = 'Server is up.'
+    });
+    router.post( '/scan/rfTag', ( ctx, next ) => {
+    });
 
     app.use( router.routes() );
     app.use( router.allowedMethods() );
     app.on( 'error', err => {
         console.log( chalk.bgRedBright( err ) );
     });
-    const server = await createServer( app );
 
-    await promisify( server.listen.bind( server ) )( PORT );
+    app.listen( PORT );
 
     console.log( `HTTP server listening on port ${chalk.bold( PORT )}` );
 }

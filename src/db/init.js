@@ -4,7 +4,7 @@ import { MONGO_URI } from '../env';
 
 mongoose.connect( MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-const db = mongoose.connection;
+export const db = mongoose.connection;
 
 db.on( 'error', () => {
     console.log( chalk.bgRedBright( 'connection error:' ) )
