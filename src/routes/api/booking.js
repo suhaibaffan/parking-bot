@@ -99,7 +99,7 @@ export async function checkForExistingBooking ( ctx, next ) {
 export async function cancelExpiredBookings () {
     const bookings = await Booking.find({
         expired: false,
-        booking_at: { $gte: new Date().getTime() - ( 30 * 60 * 1000 ), $lte: new Date().getTime() - ( 15 * 60 * 1000 ) }
+        booking_at: { $gte: new Date().getTime() - ( 31 * 60 * 1000 ), $lte: new Date().getTime() - ( 30 * 60 * 1000 ) }
     }).populate( 'parking_slot' );
     
     for ( const booking of bookings ) {
