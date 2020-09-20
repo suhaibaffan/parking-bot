@@ -3,8 +3,6 @@ import { Booking } from '../db/schemas/Booking.model';
 import { RESERVED_SLOTS, TOTAL_SLOTS, RESET } from '../env';
 
 export default async function init () {
-    const existingParkingSlotsCount = await Parking.estimatedDocumentCount();
-
     if ( RESET ) {
         await Parking.deleteMany();
         await Booking.deleteMany();

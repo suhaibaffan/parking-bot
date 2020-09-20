@@ -12,5 +12,14 @@ export async function  validateInputs ( ctx, next ) {
         return ctx;
     }
 
+    if ( ctx.request.path === '/user/register' ) {
+        const { email } = ctx.request.body;
+        if ( !email ) {
+            ctx.status = 400;
+            ctx.message = 'Invalid email';
+            return ctx;
+        }
+    }
+
     return next();
 }

@@ -9,6 +9,7 @@ import './db/init';
 import setUpParkingArena from './config/parking';
 import { checkForExistingBooking, checkForReservedParkings, saveBooking, cancelExpiredBookings } from './routes/api/booking';
 import { checkForNormalParkings, getAvailableParking, getOccupiedParking } from './routes/api/parking';
+import { whiteListBasedOnRfids, getAllRegisteredUsers, registerUser } from './routes/api/user';
 import { validateInputs } from './utils/validator';
 
 main();
@@ -36,10 +37,17 @@ async function startServer () {
     router.post( '/scan/rfTag', ( ctx, next ) => {
     });
 
+    // parking apis
     router.get( '/parking/available', getAvailableParking );
     router.get( '/parking/occupied', getOccupiedParking );
-    router.post( '/book/reserve',  validateInputs, checkForReservedParkings, checkForNormalParkings, checkForExistingBooking, saveBooking );
-    router.post( '/book/normal', validateInputs, checkForNormalParkings, checkForExistingBooking, saveBooking );
+
+    // user apis
+    router.get( '/users', getAllRegisteredUsers );
+    router.post( '/user/register', validateInputs, registerUser )
+
+    // booking apis
+    router.post( '/book/reserve',  validateInputs, whiteListBasedOnRfids, checkForReservedParkings, checkForNormalParkings, checkForExistingBooking, saveBooking );
+    router.post( '/book/normal', validateInputs, whiteListBasedOnRfids, checkForNormalParkings, checkForExistingBooking, saveBooking );
 
     app.use( router.routes() );
     app.use( router.allowedMethods() );

@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import { Booking } from '../../db/schemas/Booking.model';
 import { Parking } from '../../db/schemas/Parking.model';
+import { User } from '../../db/schemas/User.model';
 
 export async function findByRfTag ( ctx ) {
     const { rfTag } = ctx.request.body || ctx.request.query;
@@ -19,6 +20,17 @@ export async function saveBooking ( ctx, next ) {
 
     if ( !vacantParking ) {
         vacantParking = await Parking.findOne({ type: 'normal' , vacant: true }).lean();
+    }
+
+    const userType = await User.findOne({ rfid }, type ).lean();
+
+    if ( userType !== 'reserved' && type === 'reserved' ) {
+        // throw error if normal user tries to book reserved slots.
+        ctx.status = 400;
+        ctx.body = {
+            message: 'Normal user cannot book reserved slot.'
+        };
+        return ctx;
     }
 
     const booking = new Booking({
