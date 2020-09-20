@@ -9,7 +9,7 @@ const BookingSchema = new mongoose.Schema({
     parking_slot: Number,
     parked_at: Date,
     left_at: Date,
-    parking: Boolean,
+    parking: { type: Boolean, default: false },
     type: { type: String, enum: [ 'reserved', 'normal' ]}
 });
 

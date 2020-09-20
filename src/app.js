@@ -6,6 +6,8 @@ import chalk from 'chalk';
 import { promisify } from 'util';
 import { PORT } from './env';
 import './db/init';
+import { checkForExistingBooking, checkForReservedParkings, checkForNormalParkings, saveBooking } from './routes/api/booking';
+import { validateInputs } from './utils/validator';
 
 main();
 
@@ -27,6 +29,9 @@ async function startServer () {
     });
     router.post( '/scan/rfTag', ( ctx, next ) => {
     });
+
+    router.post( '/book/reserve',  validateInputs, checkForReservedParkings, checkForExistingBooking, saveBooking );
+    router.post( '/book/normal', validateInputs, checkForNormalParkings, checkForExistingBooking, saveBooking );
 
     app.use( router.routes() );
     app.use( router.allowedMethods() );
