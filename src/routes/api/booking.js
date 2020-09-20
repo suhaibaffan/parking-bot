@@ -41,10 +41,27 @@ export async function saveBooking ( ctx, next ) {
 
 export async function checkForExistingBooking ( ctx, next ) {
     const { rfid } = ctx.request.body;
+    const expiredBooking = await Booking.findOne({
+        rfid,
+        expired: true,
+        booking_at: { $gte: new Date().getTime() - ( 30 * 60 * 1000 ) }
+    }).populate( 'parking_slot' ).lean();
+
+    if ( expiredBooking ) {
+        ctx.status = 400;
+        ctx.body = {
+            status: 'Booking expired, try after sometime.',
+            parking_slot: expiredBooking.parking_slot.slot,
+            booking_id: expiredBooking.booking
+        };
+        return ctx;
+    }
+
     const booking = await Booking.findOne({
-            rfid,
-            booking_at: { $gte: new Date().getTime() - ( 30 * 60 * 1000 ) }
-        }).populate( 'parking_slot' ).lean();
+        rfid,
+        expired: false,
+        booking_at: { $gte: new Date().getTime() - ( 15 * 60 * 1000 ) }
+    }).populate( 'parking_slot' ).lean();
 
     if ( booking ) {
         ctx.status = 200;
@@ -61,12 +78,12 @@ export async function checkForExistingBooking ( ctx, next ) {
 export async function cancelExpiredBookings () {
     const bookings = await Booking.find({
         expired: false,
-        booking_at: { $gte: new Date().getTime() - ( 15 * 60 * 1000 ) }
+        booking_at: { $gte: new Date().getTime() - ( 30 * 60 * 1000 ), $lte: new Date().getTime() - ( 15 * 60 * 1000 ) }
     }).populate( 'parking_slot' );
     
     for ( const booking of bookings ) {
         booking.expired = true;
-        Parking.findByIdAndUpdate( booking.parking_slot._id, { vacant: true });
+        await Parking.findByIdAndUpdate( booking.parking_slot._id, { vacant: true });
         await booking.save();
     }
     console.log( chalk.blueBright( `${bookings.length} Expired bookings updated` ) );

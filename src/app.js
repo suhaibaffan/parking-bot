@@ -8,7 +8,7 @@ import { PORT, RESET } from './env';
 import './db/init';
 import setUpParkingArena from './config/parking';
 import { checkForExistingBooking, checkForReservedParkings, saveBooking, cancelExpiredBookings } from './routes/api/booking';
-import { checkForNormalParkings } from './routes/api/parking';
+import { checkForNormalParkings, getAvailableParking, getOccupiedParking } from './routes/api/parking';
 import { validateInputs } from './utils/validator';
 
 main();
@@ -36,6 +36,8 @@ async function startServer () {
     router.post( '/scan/rfTag', ( ctx, next ) => {
     });
 
+    router.get( '/parking/available', getAvailableParking );
+    router.get( '/parking/occupied', getOccupiedParking );
     router.post( '/book/reserve',  validateInputs, checkForReservedParkings, checkForNormalParkings, checkForExistingBooking, saveBooking );
     router.post( '/book/normal', validateInputs, checkForNormalParkings, checkForExistingBooking, saveBooking );
 
